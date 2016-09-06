@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,20 +27,31 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final String URI_KEY = "uri_key";
+    private static final String API_PARAM_KEY = "api_key";
+
     private static final int IMAGE_WIDTH = 185;
     private static final String POPULAR_URI = "http://api.themoviedb.org/3/movie/popular";
     private static final String TOP_RATED_URI = "http://api.themoviedb.org/3/movie/top_rated";
     private static final String IMAGE_BASE_URI = "http://image.tmdb.org/t/p/w" + IMAGE_WIDTH;
-    private static final String API_PARAM_KEY = "api_key";
 
     private MovieListAdapter adapter;
     private RequestQueue requestQueue;
     private ImageLoader imageLoader;
+    private String uri;
+
+    MenuItem popularItem, topRatedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            uri = POPULAR_URI;
+        } else {
+            uri = savedInstanceState.getString(URI_KEY, POPULAR_URI);
+        }
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         ImageCache imageCache = new ImageCache();
@@ -52,13 +65,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(URI_KEY, uri);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        popularItem = menu.findItem(R.id.show_popular);
+        topRatedItem = menu.findItem(R.id.show_top_rated);
+        updateUriMenuItems(uri);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.show_popular:
+                selectUri(POPULAR_URI);
+                return true;
+            case R.id.show_top_rated:
+                selectUri(TOP_RATED_URI);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void selectUri(String uri) {
+        this.uri = uri;
+        updateUriMenuItems(uri);
+        fetchMovies();
+    }
+
+    private void updateUriMenuItems(String uri) {
+        if (popularItem != null) {
+            popularItem.setChecked(POPULAR_URI.equals(uri));
+        }
+        if (topRatedItem != null) {
+            topRatedItem.setChecked(TOP_RATED_URI.equals(uri));
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
+        selectUri(uri);
+    }
 
-        Uri popularUri = Uri.parse(POPULAR_URI).buildUpon()
-                .appendQueryParameter(API_PARAM_KEY, BuildConfig.MOVIE_DB_API_KEY).build();
-
-        requestQueue.add(new JsonObjectRequest(popularUri.toString(), null, new Response.Listener<JSONObject>() {
+    private void fetchMovies() {
+        requestQueue.add(new JsonObjectRequest(getApiUrl(uri), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -68,6 +125,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, null));
+    }
+
+    private String getApiUrl(String baseUrl) {
+        return Uri.parse(baseUrl).buildUpon()
+                .appendQueryParameter(API_PARAM_KEY, BuildConfig.MOVIE_DB_API_KEY).build().toString();
     }
 
     @Override
