@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         popularItem = menu.findItem(R.id.show_popular);
         topRatedItem = menu.findItem(R.id.show_top_rated);
-        updateUriMenuItems(uri);
+        updateMenuSelection(uri);
         return true;
     }
 
@@ -101,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectUri(String uri) {
         this.uri = uri;
-        updateUriMenuItems(uri);
+        updateMenuSelection(uri);
         fetchMovies();
     }
 
-    private void updateUriMenuItems(String uri) {
+    private void updateMenuSelection(String uri) {
         if (popularItem != null) {
             popularItem.setChecked(POPULAR_URI.equals(uri));
         }
