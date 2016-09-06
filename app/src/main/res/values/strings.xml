@@ -6,4 +6,5 @@
     <string name="rating">%s☆</string>
     <string name="unknown_release_date">Unknown Release Date</string>
     <string name="release_date">(%s)</string>
+    <string name="poster_content_desc">Movie Poster</string>
 </resources>
