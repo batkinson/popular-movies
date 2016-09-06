@@ -5,7 +5,6 @@ import android.support.v4.util.LruCache;
 
 import com.android.volley.toolbox.ImageLoader;
 
-
 public class ImageCache extends LruCache<String, Bitmap> implements ImageLoader.ImageCache {
 
     private static final int DEFAULT_SIZE_BYTES = 1024 * 1024 * 25;

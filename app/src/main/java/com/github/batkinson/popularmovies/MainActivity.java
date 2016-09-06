@@ -2,7 +2,6 @@ package com.github.batkinson.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,37 +13,33 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.github.batkinson.popularmovies.Api.IMAGE_WIDTH;
+import static com.github.batkinson.popularmovies.Api.MOVIE_KEY;
+import static com.github.batkinson.popularmovies.Api.POPULAR_URI;
+import static com.github.batkinson.popularmovies.Api.POSTER_PATH;
+import static com.github.batkinson.popularmovies.Api.RESULTS;
+import static com.github.batkinson.popularmovies.Api.TOP_RATED_URI;
+import static com.github.batkinson.popularmovies.Api.URI_KEY;
+import static com.github.batkinson.popularmovies.Api.getApiUri;
+import static com.github.batkinson.popularmovies.Api.getPosterUri;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    public static final String ID_KEY = "id";
-    private static final String URI_KEY = "uri_key";
-    private static final String API_PARAM_KEY = "api_key";
-
-    private static final int IMAGE_WIDTH = 185;
-    public static final String MOVIE_BASE_URI = "http://api.themoviedb.org/3/movie";
-    private static final String POPULAR_URI = MOVIE_BASE_URI + "/popular";
-    private static final String TOP_RATED_URI = MOVIE_BASE_URI + "/top_rated";
-    public static final String IMAGE_BASE_URI = "http://image.tmdb.org/t/p/w" + IMAGE_WIDTH;
-
     private MovieListAdapter adapter;
-    private RequestQueue requestQueue;
-    private ImageLoader imageLoader;
     private String uri;
+    private MenuItem popularItem, topRatedItem;
 
-    MenuItem popularItem, topRatedItem;
+    private VolleyService volley;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +52,12 @@ public class MainActivity extends AppCompatActivity {
             uri = savedInstanceState.getString(URI_KEY, POPULAR_URI);
         }
 
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
-        ImageCache imageCache = new ImageCache();
-        imageLoader = new ImageLoader(requestQueue, imageCache);
-
         GridView movieList = (GridView) findViewById(R.id.movie_list);
         movieList.setColumnWidth(IMAGE_WIDTH);
 
         movieList.setOnItemClickListener(new PosterClickHandler(this));
+
+        volley = VolleyService.getInstance(this);
 
         adapter = new MovieListAdapter(this, -1);
         movieList.setAdapter(adapter);
@@ -121,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchMovies() {
-        requestQueue.add(new JsonObjectRequest(getApiUrl(uri), null, new Response.Listener<JSONObject>() {
+        volley.getRequestQueue().add(new JsonObjectRequest(getApiUri(uri), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -133,21 +126,33 @@ public class MainActivity extends AppCompatActivity {
         }, null));
     }
 
-    private String getApiUrl(String baseUrl) {
-        return Uri.parse(baseUrl).buildUpon()
-                .appendQueryParameter(API_PARAM_KEY, BuildConfig.MOVIE_DB_API_KEY).build().toString();
-    }
+    private static class PosterClickHandler implements AdapterView.OnItemClickListener {
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        requestQueue.stop();
+        private Context ctx;
+
+        public PosterClickHandler(Context ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Object tag = view.getTag();
+            if (tag instanceof JSONObject) {
+                JSONObject movie = ((JSONObject) tag);
+                launchDetail(movie.toString());
+            }
+        }
+
+        private void launchDetail(String movie) {
+            Intent detailIntent = new Intent();
+            detailIntent.setClass(ctx, DetailActivity.class);
+            detailIntent.putExtra(MOVIE_KEY, movie);
+            ctx.startActivity(detailIntent);
+        }
+
     }
 
     private class MovieListAdapter extends ArrayAdapter<JSONObject> {
-
-        public static final String POSTER_PATH = "poster_path";
-        public static final String RESULTS = "results";
 
         public MovieListAdapter(Context context, int resource) {
             super(context, resource);
@@ -167,9 +172,9 @@ public class MainActivity extends AppCompatActivity {
             imageView.setTag(movie);
 
             try {
-                String imageUri = Uri.parse(IMAGE_BASE_URI).buildUpon()
-                        .appendEncodedPath(movie.getString(POSTER_PATH)).build().toString();
-                imageView.setImageUrl(imageUri, imageLoader);
+                String posterPath = movie.getString(POSTER_PATH);
+                String imageUri = getPosterUri(posterPath);
+                imageView.setImageUrl(imageUri, volley.getImageLoader());
             } catch (JSONException e) {
                 Log.e(TAG, "failed to construct image url", e);
             }
@@ -190,35 +195,5 @@ public class MainActivity extends AppCompatActivity {
                 setNotifyOnChange(true);
             }
         }
-    }
-
-    private static class PosterClickHandler implements AdapterView.OnItemClickListener {
-
-        private Context ctx;
-
-        public PosterClickHandler(Context ctx) {
-            this.ctx = ctx;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Object tag = view.getTag();
-            if (tag instanceof JSONObject) {
-                JSONObject movie = ((JSONObject) tag);
-                try {
-                    launchDetail(movie.getString(ID_KEY));
-                } catch (JSONException e) {
-                    Log.e(TAG, "failed to get movie id", e);
-                }
-            }
-        }
-
-        private void launchDetail(String id) {
-            Intent detailIntent = new Intent();
-            detailIntent.setClass(ctx, DetailActivity.class);
-            detailIntent.putExtra(ID_KEY, id);
-            ctx.startActivity(detailIntent);
-        }
-
     }
 }

@@ -2,4 +2,8 @@
     <string name="app_name">Popular Movies</string>
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Top Rated</string>
+    <string name="overview">Overview</string>
+    <string name="rating">%s☆</string>
+    <string name="unknown_release_date">Unknown Release Date</string>
+    <string name="release_date">(%s)</string>
 </resources>
