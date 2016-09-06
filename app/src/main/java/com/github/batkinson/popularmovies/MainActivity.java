@@ -1,6 +1,7 @@
 package com.github.batkinson.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
@@ -27,13 +29,15 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    public static final String ID_KEY = "id";
     private static final String URI_KEY = "uri_key";
     private static final String API_PARAM_KEY = "api_key";
 
     private static final int IMAGE_WIDTH = 185;
-    private static final String POPULAR_URI = "http://api.themoviedb.org/3/movie/popular";
-    private static final String TOP_RATED_URI = "http://api.themoviedb.org/3/movie/top_rated";
-    private static final String IMAGE_BASE_URI = "http://image.tmdb.org/t/p/w" + IMAGE_WIDTH;
+    public static final String MOVIE_BASE_URI = "http://api.themoviedb.org/3/movie";
+    private static final String POPULAR_URI = MOVIE_BASE_URI + "/popular";
+    private static final String TOP_RATED_URI = MOVIE_BASE_URI + "/top_rated";
+    public static final String IMAGE_BASE_URI = "http://image.tmdb.org/t/p/w" + IMAGE_WIDTH;
 
     private MovieListAdapter adapter;
     private RequestQueue requestQueue;
@@ -59,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
         GridView movieList = (GridView) findViewById(R.id.movie_list);
         movieList.setColumnWidth(IMAGE_WIDTH);
+
+        movieList.setOnItemClickListener(new PosterClickHandler(this));
 
         adapter = new MovieListAdapter(this, -1);
         movieList.setAdapter(adapter);
@@ -158,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             JSONObject movie = getItem(position);
+            imageView.setTag(movie);
+
             try {
                 String imageUri = Uri.parse(IMAGE_BASE_URI).buildUpon()
                         .appendEncodedPath(movie.getString(POSTER_PATH)).build().toString();
@@ -182,5 +190,35 @@ public class MainActivity extends AppCompatActivity {
                 setNotifyOnChange(true);
             }
         }
+    }
+
+    private static class PosterClickHandler implements AdapterView.OnItemClickListener {
+
+        private Context ctx;
+
+        public PosterClickHandler(Context ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Object tag = view.getTag();
+            if (tag instanceof JSONObject) {
+                JSONObject movie = ((JSONObject) tag);
+                try {
+                    launchDetail(movie.getString(ID_KEY));
+                } catch (JSONException e) {
+                    Log.e(TAG, "failed to get movie id", e);
+                }
+            }
+        }
+
+        private void launchDetail(String id) {
+            Intent detailIntent = new Intent();
+            detailIntent.setClass(ctx, DetailActivity.class);
+            detailIntent.putExtra(ID_KEY, id);
+            ctx.startActivity(detailIntent);
+        }
+
     }
 }
