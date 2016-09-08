@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
 
@@ -19,6 +20,9 @@ android {
     }
     buildTypes.each {
         it.buildConfigField 'String', 'MOVIE_DB_API_KEY', MovieDBApiKey
+    }
+    dataBinding {
+        enabled = true
     }
 }
 

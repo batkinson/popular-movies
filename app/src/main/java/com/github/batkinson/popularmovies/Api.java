@@ -13,6 +13,7 @@ public class Api {
     public static final String API_PARAM_KEY = "api_key";
 
     public static final int IMAGE_WIDTH = 185;
+    public static final int IMAGE_HEIGHT = 278;
 
     public static final String MOVIE_BASE_URI = "http://api.themoviedb.org/3/movie";
     public static final String POPULAR_URI = MOVIE_BASE_URI + "/popular";

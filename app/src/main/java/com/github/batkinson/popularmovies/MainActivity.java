@@ -2,6 +2,7 @@ package com.github.batkinson.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,11 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.github.batkinson.popularmovies.databinding.ActivityMainBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         if (savedInstanceState == null) {
             uri = POPULAR_URI;
@@ -52,15 +54,12 @@ public class MainActivity extends AppCompatActivity {
             uri = savedInstanceState.getString(URI_KEY, POPULAR_URI);
         }
 
-        GridView movieList = (GridView) findViewById(R.id.movie_list);
-        movieList.setColumnWidth(IMAGE_WIDTH);
-
-        movieList.setOnItemClickListener(new PosterClickHandler(this));
-
         volley = VolleyService.getInstance(this);
-
         adapter = new MovieListAdapter(this, -1);
-        movieList.setAdapter(adapter);
+
+        binding.movieList.setColumnWidth(IMAGE_WIDTH);
+        binding.movieList.setOnItemClickListener(new PosterClickHandler(this));
+        binding.movieList.setAdapter(adapter);
     }
 
     @Override
