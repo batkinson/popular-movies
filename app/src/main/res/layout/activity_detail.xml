@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,7 +18,10 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:contentDescription="@string/poster_content_desc" />
+            android:contentDescription="@string/poster_content_desc"
+            tools:minWidth="75dp"
+            tools:minHeight="100dp"
+            tools:background="@android:color/darker_gray"/>
 
         <TextView
             android:id="@+id/title"
@@ -29,9 +33,9 @@
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@+id/thumbnail"
             android:layout_toRightOf="@+id/thumbnail"
-            android:text="Movie Title"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Movie Title" />
 
         <TextView
             android:id="@+id/release_date"
@@ -40,9 +44,9 @@
             android:layout_alignLeft="@+id/title"
             android:layout_alignStart="@+id/title"
             android:layout_below="@+id/title"
-            android:text="(2016)"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="(2016)" />
 
         <TextView
             android:id="@+id/rating"
@@ -54,9 +58,9 @@
             android:layout_marginStart="10dp"
             android:layout_toEndOf="@+id/release_date"
             android:layout_toRightOf="@+id/release_date"
-            android:text="10\u2606"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="10\u2606" />
 
         <TextView
             android:id="@+id/overview_label"
@@ -66,9 +70,9 @@
             android:layout_alignStart="@+id/thumbnail"
             android:layout_below="@+id/thumbnail"
             android:layout_marginTop="15dp"
-            android:text="@string/overview"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:text="@string/overview" />
 
         <TextView
             android:id="@+id/overview"
@@ -80,8 +84,8 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
-            android:text="The description of the movie. It is a really good movie. Trust us."
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="The description of the movie. It is a really good movie. Trust us." />
 
     </RelativeLayout>
 
