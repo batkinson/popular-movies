@@ -11,6 +11,7 @@
     tools:context="com.github.batkinson.popularmovies.MainActivity">
 
     <fragment
+        android:id="@+id/poster_fragment"
         android:name="com.github.batkinson.popularmovies.PosterFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
