@@ -7,13 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import org.json.JSONObject;
 
 import static com.github.batkinson.popularmovies.Api.MOVIE_KEY;
+import static com.github.batkinson.popularmovies.R.layout.activity_main;
 
 public class MainActivity extends AppCompatActivity implements PosterFragment.PosterSelectionHandler {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(activity_main);
     }
 
     @Override

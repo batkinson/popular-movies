@@ -4,6 +4,7 @@ package com.github.batkinson.popularmovies;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -154,7 +155,7 @@ public class PosterFragment extends Fragment {
 
         private PosterSelectionHandler handler;
 
-        public PosterClickHandler(PosterSelectionHandler handler) {
+        PosterClickHandler(PosterSelectionHandler handler) {
             this.handler = handler;
         }
 
@@ -170,12 +171,13 @@ public class PosterFragment extends Fragment {
 
     private class MovieListAdapter extends ArrayAdapter<JSONObject> {
 
-        public MovieListAdapter(Context context, int resource) {
+        MovieListAdapter(Context context, int resource) {
             super(context, resource);
         }
 
+        @NonNull
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
             NetworkImageView imageView;
             if (convertView == null) {
@@ -188,9 +190,11 @@ public class PosterFragment extends Fragment {
             imageView.setTag(movie);
 
             try {
-                String posterPath = movie.getString(POSTER_PATH);
-                String imageUri = getPosterUri(posterPath);
-                imageView.setImageUrl(imageUri, volley.getImageLoader());
+                if (movie != null) {
+                    String posterPath = movie.getString(POSTER_PATH);
+                    String imageUri = getPosterUri(posterPath);
+                    imageView.setImageUrl(imageUri, volley.getImageLoader());
+                }
             } catch (JSONException e) {
                 Log.e(TAG, "failed to construct image url", e);
             }
@@ -198,7 +202,7 @@ public class PosterFragment extends Fragment {
             return imageView;
         }
 
-        public void setContents(JSONObject resultRoot) throws JSONException {
+        void setContents(JSONObject resultRoot) throws JSONException {
             JSONArray results = resultRoot.getJSONArray(RESULTS);
             try {
                 setNotifyOnChange(false);
