@@ -2,7 +2,6 @@ package com.github.batkinson.popularmovies;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,7 +26,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.github.batkinson.popularmovies.Api.IMAGE_WIDTH;
-import static com.github.batkinson.popularmovies.Api.MOVIE_KEY;
 import static com.github.batkinson.popularmovies.Api.POPULAR_URI;
 import static com.github.batkinson.popularmovies.Api.POSTER_PATH;
 import static com.github.batkinson.popularmovies.Api.RESULTS;
@@ -40,11 +38,17 @@ public class PosterFragment extends Fragment {
 
     private static final String TAG = PosterFragment.class.getSimpleName();
 
+    interface PosterSelectionHandler {
+        void onPosterSelected(JSONObject rename);
+    }
+
     private MovieListAdapter adapter;
     private String uri;
     private MenuItem popularItem, topRatedItem;
 
     private VolleyService volley;
+
+    PosterSelectionHandler selectionHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,20 @@ public class PosterFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(URI_KEY, uri);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof PosterSelectionHandler) {
+            selectionHandler = (PosterSelectionHandler) context;
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -70,16 +88,10 @@ public class PosterFragment extends Fragment {
         adapter = new MovieListAdapter(ctx, -1);
 
         binding.movieList.setColumnWidth(IMAGE_WIDTH);
-        binding.movieList.setOnItemClickListener(new PosterClickHandler(ctx));
+        binding.movieList.setOnItemClickListener(new PosterClickHandler(selectionHandler));
         binding.movieList.setAdapter(adapter);
 
         return binding.getRoot();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(URI_KEY, uri);
     }
 
     @Override
@@ -140,10 +152,10 @@ public class PosterFragment extends Fragment {
 
     private static class PosterClickHandler implements AdapterView.OnItemClickListener {
 
-        private Context ctx;
+        private PosterSelectionHandler handler;
 
-        public PosterClickHandler(Context ctx) {
-            this.ctx = ctx;
+        public PosterClickHandler(PosterSelectionHandler handler) {
+            this.handler = handler;
         }
 
         @Override
@@ -151,17 +163,9 @@ public class PosterFragment extends Fragment {
             Object tag = view.getTag();
             if (tag instanceof JSONObject) {
                 JSONObject movie = ((JSONObject) tag);
-                launchDetail(movie.toString());
+                handler.onPosterSelected(movie);
             }
         }
-
-        private void launchDetail(String movie) {
-            Intent detailIntent = new Intent();
-            detailIntent.setClass(ctx, DetailActivity.class);
-            detailIntent.putExtra(MOVIE_KEY, movie);
-            ctx.startActivity(detailIntent);
-        }
-
     }
 
     private class MovieListAdapter extends ArrayAdapter<JSONObject> {
