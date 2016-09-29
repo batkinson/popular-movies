@@ -6,6 +6,7 @@
     <!-- Spacing for main movie poster grid -->
     <dimen name="poster_grid_horizontal_spacing">10dp</dimen>
     <dimen name="poster_grid_vertical_spacing">10dp</dimen>
+    <dimen name="dual_pane_margin">10dp</dimen>
 
     <!-- Detail -->
     <dimen name="detail_title_margin_left">10dp</dimen>
