@@ -9,6 +9,7 @@
         android:horizontalSpacing="@dimen/poster_grid_horizontal_spacing"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="@dimen/poster_grid_vertical_spacing" />
+        android:verticalSpacing="@dimen/poster_grid_vertical_spacing"
+        android:drawSelectorOnTop="true"/>
 
 </layout>
