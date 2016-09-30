@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 
+import static com.github.batkinson.popularmovies.Api.ID;
 import static com.github.batkinson.popularmovies.Api.ORIGINAL_TITLE;
 import static com.github.batkinson.popularmovies.Api.OVERVIEW;
 import static com.github.batkinson.popularmovies.Api.POSTER_PATH;
@@ -14,6 +15,7 @@ import static com.github.batkinson.popularmovies.Api.getPosterUri;
 
 public class MovieDetail {
 
+    private long id;
     private String imageUrl;
     private String title;
     private String releaseYear;
@@ -21,6 +23,7 @@ public class MovieDetail {
     private String overview;
 
     MovieDetail(JSONObject movie) throws JSONException {
+        id = movie.getLong(ID);
         imageUrl = getPosterUri(movie.getString(POSTER_PATH));
         title = movie.getString(ORIGINAL_TITLE);
         try {
@@ -30,6 +33,10 @@ public class MovieDetail {
         }
         rating = movie.getString(VOTE_AVERAGE);
         overview = movie.getString(OVERVIEW);
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getImageUrl() {

@@ -20,6 +20,7 @@ public class Api {
     public static final String TOP_RATED_URI = MOVIE_BASE_URI + "/top_rated";
     public static final String IMAGE_BASE_URI = "http://image.tmdb.org/t/p/w" + IMAGE_WIDTH;
 
+    public static final String ID = "id";
     public static final String POSTER_PATH = "poster_path";
     public static final String RESULTS = "results";
     public static final String ORIGINAL_TITLE = "original_title";
