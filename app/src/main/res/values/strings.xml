@@ -7,4 +7,6 @@
     <string name="unknown_release_date">Unknown Release Date</string>
     <string name="release_date">(%s)</string>
     <string name="poster_content_desc">Movie Poster</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
 </resources>

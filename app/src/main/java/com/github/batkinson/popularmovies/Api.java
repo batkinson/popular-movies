@@ -54,6 +54,12 @@ public class Api {
                         BuildConfig.MOVIE_DB_API_KEY).build().toString();
     }
 
+    public static Uri getYouTubeUri(String key) {
+        return Uri.parse("http://www.youtube.com").buildUpon()
+                .appendPath("watch")
+                .appendQueryParameter("v", key).build();
+    }
+
     public static String getReviewsPath(long movieId) {
         return Uri.parse(MOVIE_BASE_URI).buildUpon()
                 .appendPath(Long.toString(movieId))
