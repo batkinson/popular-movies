@@ -26,10 +26,6 @@ public class Api {
     public static final String ID = "id";
     public static final String POSTER_PATH = "poster_path";
     public static final String RESULTS = "results";
-    public static final String ORIGINAL_TITLE = "original_title";
-    public static final String RELEASE_DATE = "release_date";
-    public static final String VOTE_AVERAGE = "vote_average";
-    public static final String OVERVIEW = "overview";
 
     public static String getApiUri(String uriWithoutKey) {
         return Uri.parse(uriWithoutKey).buildUpon()

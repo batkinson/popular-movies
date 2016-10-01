@@ -6,14 +6,15 @@ import org.json.JSONObject;
 import java.text.ParseException;
 
 import static com.github.batkinson.popularmovies.Api.ID;
-import static com.github.batkinson.popularmovies.Api.ORIGINAL_TITLE;
-import static com.github.batkinson.popularmovies.Api.OVERVIEW;
 import static com.github.batkinson.popularmovies.Api.POSTER_PATH;
-import static com.github.batkinson.popularmovies.Api.RELEASE_DATE;
-import static com.github.batkinson.popularmovies.Api.VOTE_AVERAGE;
 import static com.github.batkinson.popularmovies.Api.getPosterUri;
 
 public class MovieDetail {
+
+    private static final String ORIGINAL_TITLE = "original_title";
+    private static final String RELEASE_DATE = "release_date";
+    private static final String VOTE_AVERAGE = "vote_average";
+    private static final String OVERVIEW = "overview";
 
     private long id;
     private String imageUrl;

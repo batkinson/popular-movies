@@ -1,9 +1,6 @@
 package com.github.batkinson.popularmovies;
 
 import android.content.Context;
-import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,48 +8,47 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.github.batkinson.popularmovies.databinding.FragmentDetailBinding;
+import com.github.batkinson.popularmovies.databinding.ViewReviewBinding;
+import com.github.batkinson.popularmovies.databinding.ViewTrailerBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static android.content.Intent.ACTION_VIEW;
+import static android.databinding.DataBindingUtil.inflate;
 import static com.github.batkinson.popularmovies.Api.IMAGE_HEIGHT;
 import static com.github.batkinson.popularmovies.Api.IMAGE_WIDTH;
 import static com.github.batkinson.popularmovies.Api.MOVIE_KEY;
+import static com.github.batkinson.popularmovies.Api.RESULTS;
 import static com.github.batkinson.popularmovies.Api.getReviewsPath;
 import static com.github.batkinson.popularmovies.Api.getVideosUri;
-import static com.github.batkinson.popularmovies.Api.getYouTubeUri;
+import static com.github.batkinson.popularmovies.DetailFragment.TAG;
 import static com.github.batkinson.popularmovies.R.layout.fragment_detail;
+import static com.github.batkinson.popularmovies.R.layout.view_review;
 import static com.github.batkinson.popularmovies.R.layout.view_trailer;
 
 public class DetailFragment extends Fragment {
 
-    private static final String TAG = DetailActivity.class.getSimpleName();
+    static final String TAG = DetailActivity.class.getSimpleName();
 
     private VolleyService volley;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
-        Context ctx = getContext();
-
-        volley = VolleyService.getInstance(ctx);
+        volley = VolleyService.getInstance(getContext());
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        FragmentDetailBinding binding = DataBindingUtil.inflate(inflater, fragment_detail, container, false);
+        FragmentDetailBinding binding = inflate(inflater, fragment_detail, container, false);
 
         Bundle args = getArguments();
 
@@ -63,57 +59,77 @@ public class DetailFragment extends Fragment {
             binding.setMovie(detail);
             binding.thumbnail.setImageUrl(detail.getImageUrl(), volley.getImageLoader());
             RequestQueue queue = volley.getRequestQueue();
-            queue.add(new JsonObjectRequest(getVideosUri(detail.getId()), null, new TrailerPopulator(getContext(), binding.trailerList), null));
-            queue.add(new JsonObjectRequest(getReviewsPath(detail.getId()), null, new RequestLogger(), null));
+            queue.add(new JsonObjectRequest(getVideosUri(detail.getId()), null, new TrailerHandler(getContext(), binding.trailerList), null));
+            queue.add(new JsonObjectRequest(getReviewsPath(detail.getId()), null, new ReviewHandler(getContext(), binding.reviewList), null));
         } catch (JSONException e) {
             Log.e(TAG, "failed populating details", e);
         }
 
-
         return binding.getRoot();
     }
+}
 
-    private static class RequestLogger implements Response.Listener<JSONObject> {
-        @Override
-        public void onResponse(JSONObject response) {
-            Log.i(TAG, response.toString());
-        }
+
+abstract class ResponseHandler<T> implements Response.Listener<T> {
+
+    Context ctx;
+    LayoutInflater inflater;
+    ViewGroup container;
+    UriLauncher launcher;
+
+    ResponseHandler(Context ctx, ViewGroup container) {
+        this.ctx = ctx;
+        inflater = LayoutInflater.from(ctx);
+        this.container = container;
+        launcher = new UriLauncher(ctx);
+    }
+}
+
+
+class TrailerHandler extends ResponseHandler<JSONObject> {
+
+    TrailerHandler(Context ctx, ViewGroup container) {
+        super(ctx, container);
     }
 
-    private static class TrailerPopulator implements Response.Listener<JSONObject> {
-
-        Context ctx;
-        LayoutInflater inflater;
-        ViewGroup container;
-
-        TrailerPopulator(Context ctx, ViewGroup container) {
-            this.ctx = ctx;
-            inflater = LayoutInflater.from(ctx);
-            this.container = container;
-        }
-
-        @Override
-        public void onResponse(JSONObject response) {
-            try {
-                JSONArray results = response.getJSONArray("results");
-                for (int i = 0; i < results.length(); i++) {
-                    JSONObject result = results.getJSONObject(i);
-                    final String key = result.getString("key");
-                    if ("trailer".equalsIgnoreCase(result.getString("type"))) {
-                        TextView trailer = (TextView) inflater.inflate(view_trailer, null);
-                        trailer.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ctx.startActivity(new Intent(ACTION_VIEW, getYouTubeUri(key)));
-                            }
-                        });
-                        trailer.setText(result.getString("name"));
-                        container.addView(trailer);
-                    }
+    @Override
+    public void onResponse(JSONObject response) {
+        try {
+            JSONArray results = response.getJSONArray(RESULTS);
+            for (int i = 0; i < results.length(); i++) {
+                MovieVideo video = new MovieVideo(results.getJSONObject(i));
+                if (video.isTrailer()) {
+                    ViewTrailerBinding binding = inflate(inflater, view_trailer, container, false);
+                    binding.setVideo(video);
+                    binding.setLauncher(launcher);
+                    container.addView(binding.getRoot());
                 }
-            } catch (JSONException e) {
-                Log.w(TAG, "failed to populate trailers from json", e);
             }
+        } catch (JSONException e) {
+            Log.w(TAG, "failed to populate trailers from json", e);
+        }
+    }
+}
+
+
+class ReviewHandler extends ResponseHandler<JSONObject> {
+
+    ReviewHandler(Context ctx, ViewGroup container) {
+        super(ctx, container);
+    }
+
+    @Override
+    public void onResponse(JSONObject response) {
+        try {
+            JSONArray results = response.getJSONArray(RESULTS);
+            for (int i = 0; i < results.length(); i++) {
+                ViewReviewBinding binding = inflate(inflater, view_review, container, false);
+                binding.setReview(new MovieReview(results.getJSONObject(i)));
+                binding.setLauncher(launcher);
+                container.addView(binding.getRoot());
+            }
+        } catch (JSONException e) {
+            Log.w(TAG, "failed to populate reviews from json", e);
         }
     }
 }
