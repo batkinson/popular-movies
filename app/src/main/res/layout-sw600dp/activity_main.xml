@@ -25,6 +25,7 @@
         android:layout_marginLeft="@dimen/dual_pane_margin"
         android:layout_marginStart="@dimen/dual_pane_margin"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         android:layout_weight="1" />
 
 </LinearLayout>
