@@ -12,6 +12,8 @@
     <dimen name="detail_title_margin_left">10dp</dimen>
     <dimen name="detail_rating_margin_left">10dp</dimen>
     <dimen name="detail_section_margin_top">15dp</dimen>
-    <dimen name="detail_overview_margin_top">10dp</dimen>
+    <dimen name="detail_section_margin_bottom">10dp</dimen>
+    <dimen name="review_margin_bottom">10dp</dimen>
+    <dimen name="review_content_margin_top">5dp</dimen>
 
 </resources>

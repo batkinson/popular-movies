@@ -79,8 +79,9 @@
                 android:layout_alignStart="@+id/thumbnail"
                 android:layout_below="@+id/thumbnail"
                 android:layout_marginTop="@dimen/detail_section_margin_top"
+                android:layout_marginBottom="@dimen/detail_section_margin_bottom"
                 android:text="@string/overview"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textStyle="bold" />
 
             <TextView
@@ -90,50 +91,54 @@
                 android:layout_alignLeft="@+id/overview_label"
                 android:layout_alignStart="@id/overview_label"
                 android:layout_below="@+id/overview_label"
-                android:layout_marginTop="@dimen/detail_overview_margin_top"
                 android:text="@{movie.overview}"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 tools:text="The description of the movie. It is a really good movie. Trust us." />
 
-            <TextView
-                android:id="@+id/trailers_label"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/trailers"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/overview"
                 android:layout_alignStart="@+id/overview"
                 android:layout_below="@+id/overview"
                 android:layout_marginTop="@dimen/detail_section_margin_top"
-                android:text="@string/trailers"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/trailers_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/detail_section_margin_bottom"
+                    android:text="@string/trailers"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/trailer_list"
+                android:id="@+id/reviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/trailers_label"
+                android:layout_alignLeft="@+id/trailers"
+                android:layout_alignStart="@+id/trailers"
+                android:layout_below="@+id/trailers"
                 android:layout_marginTop="@dimen/detail_section_margin_top"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-            <TextView
-                android:id="@+id/reviews_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/trailer_list"
-                android:layout_alignStart="@+id/trailer_list"
-                android:layout_below="@+id/trailer_list"
-                android:layout_marginTop="@dimen/detail_section_margin_top"
-                android:text="@string/reviews"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/reviews_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reviews"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/review_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/reviews_label"
-                android:layout_marginTop="@dimen/detail_section_margin_top"
-                android:orientation="vertical" />
+            </LinearLayout>
 
         </RelativeLayout>
 

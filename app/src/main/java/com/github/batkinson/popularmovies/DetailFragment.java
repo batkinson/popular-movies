@@ -21,6 +21,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static android.databinding.DataBindingUtil.inflate;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.github.batkinson.popularmovies.Api.IMAGE_HEIGHT;
 import static com.github.batkinson.popularmovies.Api.IMAGE_WIDTH;
 import static com.github.batkinson.popularmovies.Api.MOVIE_KEY;
@@ -59,8 +61,8 @@ public class DetailFragment extends Fragment {
             binding.setMovie(detail);
             binding.thumbnail.setImageUrl(detail.getImageUrl(), volley.getImageLoader());
             RequestQueue queue = volley.getRequestQueue();
-            queue.add(new JsonObjectRequest(getVideosUri(detail.getId()), null, new TrailerHandler(getContext(), binding.trailerList), null));
-            queue.add(new JsonObjectRequest(getReviewsPath(detail.getId()), null, new ReviewHandler(getContext(), binding.reviewList), null));
+            queue.add(new JsonObjectRequest(getVideosUri(detail.getId()), null, new TrailerHandler(getContext(), binding.trailers), null));
+            queue.add(new JsonObjectRequest(getReviewsPath(detail.getId()), null, new ReviewHandler(getContext(), binding.reviews), null));
         } catch (JSONException e) {
             Log.e(TAG, "failed populating details", e);
         }
@@ -105,6 +107,7 @@ class TrailerHandler extends ResponseHandler<JSONObject> {
                     container.addView(binding.getRoot());
                 }
             }
+            container.setVisibility(results.length() > 0 ? VISIBLE : GONE);
         } catch (JSONException e) {
             Log.w(TAG, "failed to populate trailers from json", e);
         }
@@ -122,12 +125,15 @@ class ReviewHandler extends ResponseHandler<JSONObject> {
     public void onResponse(JSONObject response) {
         try {
             JSONArray results = response.getJSONArray(RESULTS);
+            boolean showTrailers = false;
             for (int i = 0; i < results.length(); i++) {
                 ViewReviewBinding binding = inflate(inflater, view_review, container, false);
                 binding.setReview(new MovieReview(results.getJSONObject(i)));
                 binding.setLauncher(launcher);
                 container.addView(binding.getRoot());
+                showTrailers = true;
             }
+            container.setVisibility(showTrailers ? VISIBLE : GONE);
         } catch (JSONException e) {
             Log.w(TAG, "failed to populate reviews from json", e);
         }
