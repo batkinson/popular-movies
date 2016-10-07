@@ -21,6 +21,11 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.batkinson.popularmovies.MainActivity" />
         </activity>
+        <provider
+            android:authorities="com.github.batkinson.popularmovies"
+            android:name=".data.Provider"
+            android:exported="false">
+        </provider>
     </application>
 
 </manifest>
