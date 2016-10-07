@@ -27,9 +27,11 @@ public class ProviderContract {
 
         public static String TABLE = PATH;
         public static String COLUMN_MOVIE_ID = "movie_id";
-        public static String CREATE_SQL = format("create table %s (%s integer primary key autoincrement, %s text);",
-                TABLE, _ID, COLUMN_MOVIE_ID
-        );
+        public static String TABLE_SQL = format("create table %s (%s integer primary key autoincrement, %s text);",
+                TABLE, _ID, COLUMN_MOVIE_ID);
+        public static String IDX_NAME = "movieid_idx";
+        public static String INDEX_SQL = format("create index %s on %s(%s)",
+                IDX_NAME, TABLE, COLUMN_MOVIE_ID);
 
         public static Uri getItemUri(long rowId) {
             return URI.buildUpon().appendPath(String.valueOf(rowId)).build();

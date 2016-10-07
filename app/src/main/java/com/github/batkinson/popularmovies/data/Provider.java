@@ -23,7 +23,7 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        helper = new DatabaseHelper(getContext(), DB_NAME, null, 1);
+        helper = new DatabaseHelper(getContext(), DB_NAME, null, 2);
         return true;
     }
 
